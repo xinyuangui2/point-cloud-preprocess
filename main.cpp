@@ -23,7 +23,7 @@ long byte_length;
 long number_of_points;
 ///The data file name
 std::string file_name;
-
+std::string column_num;
 ///The geospatial bounding boxes
 std::vector<GeospatialBoundingBox *> geo_bboxes;
 ///The resolution of the bounding boxes
@@ -330,7 +330,12 @@ void computeBoundingBox(const char *file_name)	{
         ///Get the current line
         getline (is, line);
         if (!line.size()) continue;
-        sscanf(line.c_str(),"%f %f %f\n",&x,&y,&z);
+        if (column_num == "3") {
+            sscanf(line.c_str(),"%f %f %f\n",&x,&y,&z);
+        } else {
+            float a, b, c;
+            sscanf(line.c_str(), "%f %f %f %f %f %f\n", &x, &y, &z, &a, &b, &c);
+        }
 
         ///Flip the Y. This is only needed for the CHP dataset
         //y = -y;
@@ -419,13 +424,14 @@ int main(int argc, char *argv[])    {
 
     number_of_points = 0;
 
-    if (argc != 2)  {
-        std::cout << "Number of arguments should be 2. Quiting..." << std::endl;
+    if (argc != 3)  {
+        std::cout << "Number of arguments should be 3. Quiting..." << std::endl;
         exit(-1);
         //file_name = std::string("pointcloud.xyz");
     }
     else    {
         file_name = std::string(argv[1]);
+        column_num = std::string(argv[2]);
     }
 
     ///Compute the byte length of the file
